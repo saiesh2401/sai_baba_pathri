@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { TempleModule } from './temple/temple.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { PaymentModule } from './payment/payment.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PaymentModule } from './payment/payment.module';
     TempleModule,
     InventoryModule,
     PaymentModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
