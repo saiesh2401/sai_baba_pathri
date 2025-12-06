@@ -5,10 +5,36 @@ import { BookingController } from './booking/booking.controller';
 import { BookingService } from './booking/booking.service';
 import { LivestreamController } from './livestream/livestream.controller';
 import { LivestreamService } from './livestream/livestream.service';
+import { DonationsController } from './donations.controller';
+import { DonationsService } from './donations.service';
+import { GalleryController } from './gallery.controller';
+import { GalleryService } from './gallery.service';
+import { AnalyticsController } from './analytics.controller';
+import { AnalyticsService } from './analytics.service';
 
 @Module({
-    controllers: [SevaController, BookingController, LivestreamController],
-    providers: [SevaService, BookingService, LivestreamService],
-    exports: [SevaService, BookingService],
+    controllers: [
+        SevaController,
+        BookingController,
+        LivestreamController,
+        DonationsController,
+        GalleryController,
+        AnalyticsController,
+    ],
+    providers: [
+        SevaService,
+        BookingService,
+        LivestreamService,
+        DonationsService,
+        GalleryService,
+        AnalyticsService,
+    ],
+    exports: [
+        SevaService,
+        BookingService,
+        DonationsService,
+        GalleryService,
+        AnalyticsService,
+    ],
 })
 export class TempleModule { }

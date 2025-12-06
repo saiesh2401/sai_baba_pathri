@@ -140,6 +140,37 @@ model Content {
   @@map("contents")
 }
 
+model Donation {
+  id            Int           @id @default(autoincrement())
+  donorName     String
+  donorPhone    String
+  donorEmail    String?
+  amount        Decimal       @db.Decimal(10, 2)
+  purpose       String
+  address       String?
+  panNumber     String?
+  paymentStatus PaymentStatus @default(PENDING)
+  paymentId     String?
+  receiptNumber String?       @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("donations")
+}
+
+model Gallery {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  category    String   // temple, festival, seva, architecture
+  imageUrl    String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("gallery")
+}
+
 // ============================================
 // INVENTORY MANAGEMENT
 // ============================================
