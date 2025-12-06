@@ -1,0 +1,217 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// AUTH & USER MANAGEMENT
+// ============================================
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(STAFF)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions Transaction[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  STAFF
+  STOREKEEPER
+}
+
+// ============================================
+// TEMPLE CORE - DEVOTEES & SEVAS
+// ============================================
+
+model Devotee {
+  id        Int       @id @default(autoincrement())
+  name      String
+  phone     String?   @unique
+  email     String?
+  gotra     String?
+  address   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  bookings  Booking[]
+
+  @@map("devotees")
+}
+
+model Seva {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  baseAmount  Decimal  @db.Decimal(10, 2)
+  isDaily     Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bookings    Booking[]
+
+  @@map("sevas")
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  name        String
+  eventDate   DateTime
+  description String?
+  capacity    Int?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bookings    Booking[]
+
+  @@map("events")
+}
+
+model Booking {
+  id              Int            @id @default(autoincrement())
+  devoteeId       Int
+  sevaId          Int
+  eventId         Int?
+  bookingDate     DateTime
+  amount          Decimal        @db.Decimal(10, 2)
+  paymentStatus   PaymentStatus  @default(PENDING)
+  paymentId       String?
+  sankalp         String?
+  checkedIn       Boolean        @default(false)
+  poojaCompleted  Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  devotee         Devotee        @relation(fields: [devoteeId], references: [id])
+  seva            Seva           @relation(fields: [sevaId], references: [id])
+  event           Event?         @relation(fields: [eventId], references: [id])
+
+  @@map("bookings")
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Livestream {
+  id          Int      @id @default(autoincrement())
+  platform    String   @default("YouTube")
+  streamUrl   String?
+  isLive      Boolean  @default(false)
+  startedAt   DateTime?
+  endedAt     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("livestreams")
+}
+
+model Content {
+  id          Int      @id @default(autoincrement())
+  type        String   // PAGE, EVENT, GALLERY
+  title       String
+  slug        String   @unique
+  content     String?
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("contents")
+}
+
+// ============================================
+// INVENTORY MANAGEMENT
+// ============================================
+
+model Item {
+  id          Int      @id @default(autoincrement())
+  name        String
+  category    ItemCategory
+  unit        String   // KG, LITRE, PIECE, etc.
+  minStock    Decimal  @db.Decimal(10, 2)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  transactions Transaction[]
+
+  @@map("items")
+}
+
+enum ItemCategory {
+  KITCHEN
+  POOJA
+  SHOP
+  OTHER
+}
+
+model Location {
+  id          Int      @id @default(autoincrement())
+  name        String
+  type        LocationType
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  transactionsFrom Transaction[] @relation("FromLocation")
+  transactionsTo   Transaction[] @relation("ToLocation")
+
+  @@map("locations")
+}
+
+enum LocationType {
+  STORE
+  TEMPLE
+  KITCHEN
+  SHOP
+  OFFICE
+}
+
+model Transaction {
+  id             Int             @id @default(autoincrement())
+  itemId         Int
+  fromLocationId Int?
+  toLocationId   Int?
+  quantity       Decimal         @db.Decimal(10, 2)
+  type           TransactionType
+  notes          String?
+  userId         Int
+  createdAt      DateTime        @default(now())
+
+  item           Item            @relation(fields: [itemId], references: [id])
+  fromLocation   Location?       @relation("FromLocation", fields: [fromLocationId], references: [id])
+  toLocation     Location?       @relation("ToLocation", fields: [toLocationId], references: [id])
+  user           User            @relation(fields: [userId], references: [id])
+
+  @@map("transactions")
+}
+
+enum TransactionType {
+  PURCHASE
+  DONATION
+  TRANSFER
+  CONSUMPTION
+  SALE
+  ADJUSTMENT
+}
