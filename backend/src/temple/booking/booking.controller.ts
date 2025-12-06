@@ -41,6 +41,15 @@ export class BookingController {
         return this.bookingService.getDashboardStats();
     }
 
+    @Get('search')
+    @ApiOperation({ summary: 'Search bookings by phone or email' })
+    search(
+        @Query('phone') phone?: string,
+        @Query('email') email?: string,
+    ) {
+        return this.bookingService.searchBookings({ phone, email });
+    }
+
     @Get(':id')
     @ApiOperation({ summary: 'Get booking by ID' })
     findOne(@Param('id') id: string) {
@@ -53,5 +62,16 @@ export class BookingController {
     @ApiOperation({ summary: 'Update booking status' })
     updateStatus(@Param('id') id: string, @Body() dto: UpdateBookingStatusDto) {
         return this.bookingService.updateStatus(+id, dto);
+    }
+
+    @Get('export/csv')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Export bookings to CSV' })
+    async exportCSV(
+        @Query('startDate') startDate?: string,
+        @Query('endDate') endDate?: string,
+    ) {
+        return this.bookingService.exportToCSV({ startDate, endDate });
     }
 }

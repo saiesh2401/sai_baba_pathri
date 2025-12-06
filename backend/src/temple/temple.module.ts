@@ -11,6 +11,7 @@ import { GalleryController } from './gallery.controller';
 import { GalleryService } from './gallery.service';
 import { AnalyticsController } from './analytics.controller';
 import { AnalyticsService } from './analytics.service';
+import { ExportService } from './export.service';
 
 @Module({
     controllers: [
@@ -28,6 +29,7 @@ import { AnalyticsService } from './analytics.service';
         DonationsService,
         GalleryService,
         AnalyticsService,
+        ExportService,
     ],
     exports: [
         SevaService,
@@ -35,6 +37,7 @@ import { AnalyticsService } from './analytics.service';
         DonationsService,
         GalleryService,
         AnalyticsService,
+        ExportService,
     ],
 })
 export class TempleModule { }

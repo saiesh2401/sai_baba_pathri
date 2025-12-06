@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateBookingDto, UpdateBookingStatusDto } from './dto/booking.dto';
+import { ExportService } from '../export.service';
 
 @Injectable()
 export class BookingService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private exportService: ExportService,
+    ) { }
 
     async create(dto: CreateBookingDto) {
         // Find or create devotee
@@ -151,6 +155,46 @@ export class BookingService {
             todayBookings,
             todayRevenue: todayRevenue._sum.amount || 0,
             upcomingBookings,
+        };
+    }
+
+    async searchBookings(filters: { phone?: string; email?: string }) {
+        if (!filters.phone && !filters.email) {
+            return [];
+        }
+
+        const where: any = {
+            devotee: {},
+        };
+
+        if (filters.phone) {
+            where.devotee.phone = filters.phone;
+        }
+
+        if (filters.email) {
+            where.devotee.email = filters.email;
+        }
+
+        return this.prisma.booking.findMany({
+            where,
+            include: {
+                devotee: true,
+                seva: true,
+                event: true,
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+
+    async exportToCSV(filters?: { startDate?: string; endDate?: string }) {
+        const bookings = await this.findAll(filters);
+        const formattedData = this.exportService.formatBookingsForCSV(bookings);
+        const headers = Object.keys(formattedData[0] || {});
+        const csv = this.exportService.convertToCSV(formattedData, headers);
+
+        return {
+            filename: `bookings_${new Date().toISOString().split('T')[0]}.csv`,
+            content: csv,
         };
     }
 }
