@@ -228,6 +228,11 @@ For technical support:
 - Email: tech@saibabajanmasthan.org
 - Phone: +91 1234567890
 
+## 👥 Authors
+
+- **Yujiao Hou** - Co-Developer
+- **Saiesh Singh** - Co-Developer
+
 ## 🙏 Acknowledgments
 
 Built with devotion for Sai Baba Janmasthan, Pathri.
